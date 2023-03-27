@@ -45,11 +45,10 @@ export class User {
   })
   email: string;
 
-  @Column()
+  @Column({
+    select: false,
+  })
   password: string;
-
-  // @Column()
-  // name: string;
 
   @OneToMany(() => Offer, (offer) => offer.user)
   offers: Offer[];

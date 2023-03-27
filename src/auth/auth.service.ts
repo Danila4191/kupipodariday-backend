@@ -17,7 +17,10 @@ export class AuthService {
     return { access_token: this.jwtService.sign(payload, { secret: options }) };
   }
   async validate(username: string, password: string) {
-    const user = await this.usersService.getUserByName(username);
+    const user = await this.usersService.getUserByNameAuth(
+      { username: username },
+      { password: true },
+    );
     if (!user) {
       throw new NotFoundException();
     }
@@ -28,6 +31,8 @@ export class AuthService {
     if (!isValidPassword) {
       return null;
     }
-    return user;
+    const userData = await this.usersService.getUserByName(username);
+    console.log(userData);
+    return userData;
   }
 }

@@ -30,7 +30,7 @@ export class UsersController {
   }
   @Patch('/me')
   async updateUser(@Body() body: UpdateUserDto, @Req() { user }) {
-    return await this.usersService.updateUser(user.id, body);
+    return await this.usersService.updateUser(user.id, body, body.password);
   }
   @Get('/me/wishes')
   async getMyUserWishes(@Req() { user }: { user: User }) {

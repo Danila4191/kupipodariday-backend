@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { WishesService } from 'src/wishes/wishes.service';
@@ -46,5 +47,20 @@ export class WishlistsService {
     }
     await this.wishelistsRepository.delete(id);
     return wishlist;
+  }
+  async update(
+    id: number,
+    userId: number,
+    updateWishlistDto: UpdateWishlistDto,
+  ) {
+    const wishList = await this.findId(id);
+    if (!wishList) {
+      return new NotFoundException();
+    }
+    if (userId !== wishList.owner.id) {
+      return new ForbiddenException();
+    }
+    await this.wishelistsRepository.update(id, updateWishlistDto);
+    return this.findId(id);
   }
 }

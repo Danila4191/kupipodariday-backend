@@ -25,19 +25,36 @@ export class UsersService {
   getUserByName(username: string) {
     return this.userRepository.findOneBy({ username });
   }
-  async updateUser(id: number, newData: UpdateUserDto) {
+  getUserByNameAuth(where: any, select?: any) {
+    return this.userRepository.findOne({
+      where: where,
+      select: select,
+    });
+  }
+
+  async updateUser(id: number, newData: UpdateUserDto, password?: string) {
     const user = await this.getById(id);
-    const { password } = newData;
-    const NewPassword = await bcrypt.hash(password, 10);
-    const newDataUser: User = {
-      ...user,
-      password: NewPassword,
-      username: newData?.username,
-      email: newData?.email,
-      about: newData?.about,
-      avatar: newData?.avatar,
-    };
-    await this.userRepository.update(user.id, newDataUser);
+    if (password) {
+      const NewPassword = await bcrypt.hash(password, 10);
+      const newDataUser: User = {
+        ...user,
+        password: NewPassword,
+        username: newData?.username,
+        email: newData?.email,
+        about: newData?.about,
+        avatar: newData?.avatar,
+      };
+      await this.userRepository.update(user.id, newDataUser);
+    } else {
+      const newDataUser: User = {
+        ...user,
+        username: newData?.username,
+        email: newData?.email,
+        about: newData?.about,
+        avatar: newData?.avatar,
+      };
+      await this.userRepository.update(user.id, newDataUser);
+    }
     return await this.getById(id);
   }
   async getById(id: number) {
@@ -45,7 +62,7 @@ export class UsersService {
   }
   async find(name: string) {
     return await this.userRepository.find({
-      where: [{ username: Like(`${name}%`) }],
+      where: [{ username: Like(`${name}%`) }, { email: Like(`${name}%`) }],
     });
   }
   async getUserWishes(username: any) {

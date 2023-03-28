@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { Wish } from './entities/wish.entity';
@@ -49,6 +49,11 @@ export class WishesService {
       take: 40,
       order: { createdAt: 'desc' },
       relations: ['offers', 'owner', 'offers.user'],
+    });
+  }
+  async findArr(idArr: number[]) {
+    return this.wishRepository.find({
+      where: { id: In(idArr) },
     });
   }
   async update(wishId: number, userId: number, body: UpdateWishDto) {
